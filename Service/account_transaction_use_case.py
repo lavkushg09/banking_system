@@ -25,10 +25,8 @@ class AmountTransaction:
         :raises ValueError: If an invalid transaction type is provided.
         """
         account = self.account_repository.find_account_by_id(account_id)
-        print("Transaction", f"{account.__dict__}")
         if transaction_type == "deposit":
             account.deposit(amount)
-            print(account.balance, "balance")
         elif transaction_type == "withdraw":
             account.withdraw(amount)
         else:

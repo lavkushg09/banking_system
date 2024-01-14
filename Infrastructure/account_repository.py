@@ -26,11 +26,9 @@ class AccountRepository:
         :return: The saved or updated account.
         :raises RuntimeError: If an error occurs during the database operation.
         """
-        print("1111111111")
         connection = self.db_connection.create_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        print(cursor.fetchall())
         try:
             already_account = self.find_accounts_by_customer_id(account.customer_id)
             if already_account:
@@ -43,12 +41,9 @@ class AccountRepository:
             _, account_id = self._save_account(account, connection)
             account.set_account_id(account_id)
             connection.commit()
-            print("22222222")
             return account
         except RuntimeError as e:
-            print(e)
             connection.rollback()
-            print("33333333")
         finally:
             connection.close()
 
