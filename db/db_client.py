@@ -41,7 +41,8 @@ class DatabaseConnection:
             if rows:
                 return rows, last_row_id
             return None, last_row_id
-        except sqlite3.Error as e:
-            raise RuntimeError("Could not execute query")
         except sqlite3.IntegrityError as e:
             raise RuntimeError("Could not execute query due to IntegrityError")
+        except sqlite3.Error as e:
+            raise RuntimeError("Could not execute query")
+        

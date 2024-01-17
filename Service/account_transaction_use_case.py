@@ -1,5 +1,8 @@
+import logging
 from Infrastructure import AccountRepository
 from Domain import Account
+from Service.utils import TransactionFailedException
+
 
 
 class AmountTransaction:
@@ -24,16 +27,22 @@ class AmountTransaction:
         :return: The updated account instance.
         :raises ValueError: If an invalid transaction type is provided.
         """
-        account = self.account_repository.find_account_by_id(account_id)
-        if transaction_type == "deposit":
-            account.deposit(amount)
-        elif transaction_type == "withdraw":
-            account.withdraw(amount)
-        else:
-            raise ValueError("Invalid transaction type")
-        account_ins = self.account_repository.save_account(account)
-        self.create_transaction(account_id, amount, transaction_type)
-        return account_ins
+        try:
+            account = self.account_repository.find_account_by_id(account_id)
+            if transaction_type == "deposit":
+                account.deposit(amount)
+            elif transaction_type == "withdraw":
+                account.withdraw(amount)
+            else:
+                raise ValueError("Invalid transaction type")
+            account_ins = self.account_repository.save_account(account)
+            self.create_transaction(account_id, amount, transaction_type)
+            logging.info("Transaction completed successfully")
+            return account_ins
+        except (RuntimeError, ValueError) as e:
+            logging.debug(f"{str(e)}")
+            raise TransactionFailedException(str(e))
+            
 
     def create_transaction(self, account_id: int, amount: float, transaction_type: str):
         """

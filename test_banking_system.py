@@ -7,7 +7,7 @@ from db.db_client import DatabaseConnection
 from Domain.account import Account
 from Domain.customer import Customer
 from Infrastructure.account_repository import AccountRepository
-from Service import AmountTransaction, AccountOpening, GenerateStatements
+from Service import AmountTransaction, AccountOpening, GenerateStatements, TransactionFailedException
 
 class TestAccountRepository(unittest.TestCase):
     def setUp(self):
@@ -102,6 +102,13 @@ class TestAccountRepository(unittest.TestCase):
         self.assertEqual(result_account.account_number, self.account_ins.account_number)
         self.assertEqual(result_account.balance, initial_balance + amount)
 
+    def test_make_transaction_deposit_with_negative_amount(self):
+        amount = -50.0
+        transaction_type = "deposit"
+        with self.assertRaises(TransactionFailedException):
+            self.amount_transaction.make_transaction(self.account_ins.account_id, 
+                                                                  amount, transaction_type)
+
     def test_make_transaction_withdrawal(self):
         initial_balance = self.account_ins.get_balance()
         deposit_amount = 50.0
@@ -117,16 +124,23 @@ class TestAccountRepository(unittest.TestCase):
         self.assertEqual(result_account.account_number, self.account_ins.account_number)
         self.assertEqual(result_account.balance, initial_balance + deposit_amount-withdrawal_acount)
 
+    def test_make_transaction_withdrawal(self):
+        transaction_type = "withdraw"
+        withdrawal_acount = -25
+        with self.assertRaises(TransactionFailedException):
+            self.amount_transaction.make_transaction(self.account_ins.account_id, 
+                                                                  withdrawal_acount, transaction_type)
+
     def test_make_transaction_invalid_type(self):
         deposit_amount = 50.0
         transaction_type = "depositamount"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TransactionFailedException):
             self.amount_transaction.make_transaction(self.account_ins.account_id, deposit_amount, transaction_type)
 
     def test_make_transaction_invalid_amount_withdrawal(self):
         deposit_amount = 150.0
         transaction_type = "withdraw"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TransactionFailedException):
             self.amount_transaction.make_transaction(self.account_ins.account_id, deposit_amount, transaction_type)
 
     def test_generate_account_statement(self):

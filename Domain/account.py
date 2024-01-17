@@ -32,6 +32,8 @@ class Account:
         :param amount: Amount to deposit.
         :return: Updated balance after the deposit.
         """
+        if amount<=0:
+            raise ValueError("Amount cannot be negative or zero.")
         self.balance += amount
         return self.balance
 
@@ -43,7 +45,9 @@ class Account:
         :return: Updated balance after the withdrawal.
         :raises ValueError: If there are insufficient funds for the withdrawal.
         """
-        if self.balance >= amount:
+        if amount<=0:
+            raise ValueError("Amount cannot be negative or zero.")
+        elif self.balance >= amount:
             self.balance -= amount
             return self.balance
         else:

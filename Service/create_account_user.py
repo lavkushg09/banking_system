@@ -25,11 +25,14 @@ class AccountOpening:
         :param phone_number: The phone number of the customer.
         :return: The newly created account.
         """
-        customer = Customer(customer_id, name, email, phone_number)
-        account_number = self.__generate_account_number()
-        account = Account(None, customer_id, account_number)
-        account = self.account_repository.save_account(account, customer)
-        return account
+        try:
+            customer = Customer(customer_id, name, email, phone_number)
+            account_number = self.__generate_account_number()
+            account = Account(None, customer_id, account_number)
+            account = self.account_repository.save_account(account, customer)
+            return account
+        except RuntimeError as e:
+            raise RuntimeError(f"Account creation got failed. Error details : {e}")
 
     @staticmethod
     def __generate_account_number() -> int:

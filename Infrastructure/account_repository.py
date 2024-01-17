@@ -44,6 +44,7 @@ class AccountRepository:
             return account
         except RuntimeError as e:
             connection.rollback()
+            raise RuntimeError(e)
         finally:
             connection.close()
 
